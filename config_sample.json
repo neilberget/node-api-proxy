@@ -1,0 +1,8 @@
+{
+	"http://api.github.com/": {
+		"proxyURL": "",
+		"routes": {
+			"/repos/mattpardee/node-api-proxy/contributions" : "canned/contributions.json"
+		}
+	}
+}

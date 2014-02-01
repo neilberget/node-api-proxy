@@ -1,0 +1,28 @@
+{
+  "name": "node-api-proxy",
+  "description": "A dumb API proxy that can also respond with canned JSON for quickly scaffolding a client app",
+  "version": "0.0.1",
+  "author": "Matt Pardee <matt.pardee@gmail.com>",
+  "contributors": [
+    {
+      "name": "Matt Pardee",
+      "email": "matt.pardee@gmail.com"
+    }
+  ],
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/mattpardee/node-api-proxy.git"
+  },
+  "dependencies": {
+    "request": "~2.33.0"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/mattpardee/node-api-proxy/raw/master/LICENSE"
+    }
+  ]
+}
