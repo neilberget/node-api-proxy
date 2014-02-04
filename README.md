@@ -16,15 +16,14 @@ simply return the results back to the requesting application.
 When building a new mobile or web client you might need it to
 interact with an API server. Building API endpoints can be
 expensive and limits the opportunity to rapidly build
-prototypes that the rest of the development team, designers,
-managers and QA engineers can interact with.
+interactive prototypes.
 
 By using an API proxy you can build canned JSON responses 
-and return those responses on routes you haven't built out yet.
-Thus you can quickly scaffold the front-end of your application
+to return on routes you haven't built out yet. Thus you
+can quickly scaffold the front-end of your application
 while the API endpoints are built out.
 
-It also gives you the opportunity to determine your API spec.
+It also allows you to be more thoughtful about your API spec.
 
 
 ##How to Use
@@ -46,7 +45,7 @@ request.get('http://api.yourwebsite.com/v3/users', function(err, res, body) {
 });
 ```
 
---or on a web client--
+--or on a web client with jQuery--
 
 ```javscript
 $.get('http://api.yourwebsite.com/v3/users', function(data) {
@@ -72,54 +71,45 @@ First create a new configuration file called `config.json`. It takes an
 array of configurations. Here is an example:
 
 ```javascript
-[
-	{
-		"host": "http://api.myservice.com",
-		"proxyURL": "/v2.4/",
-		"routes": {
-			"/v2.4/users" : "canned/v2/users.json",
-			"/v2.4/friends" : "canned/v2/friends.json"
-		}
+{
+	"canned": {
+		"/v2.4/funding" : "../../canned/funding.json",
+		"/v2.4/schools" : "../../canned/schools.json",
+		"/v2.4/members" : "../../canned/members.json"
 	},
-	{
-		"host": "http://api.myservice.com",
-		"proxyURL": "/v3/",
-		"routes": {
-			"/v3/groups" : "canned/v3/groups.json",
-			"/v3/schools" : "canned/v3/schools.json"
+
+	"proxies": [
+		{
+			"host": "https://api.myservice.com/v2.4",
+			"proxyURL": "/v2.4/"
+		},
+		{
+			"host": "http://newapi.myservice.com/v3",
+			"proxyURL": "/v3/"
 		}
-	}
-]
+	]
+}
 ```
 
-For all the routes defined in each configuration block, it will
-load up the canned response file in the `canned` directory and
-pipe that back to the requesting client.
-
-In other words, if the client is requesting:
+In this configuration, '/v2.4/members' is in the "canned" block. 
+If the client is requesting:
 
 ```
-http://localhost:4040/v2.4/users
+http://localhost:4040/v2.4/members
 ```
 
-The API server will "catch" this route and return the file in
-"canned/v2/users.json". For every other request your client makes
-to `/v2.4/*` it will be routed to `http://api.myservice.com`.
+The API server will catch this route and return the file in
+"canned/v2/members.json".
 
-So while _this_ route was caught by the proxy:
-
-```
-http://localhost:4040/v2.4/users
-```
-
-This:
+For every other request your client makes to `/v2.4/*` it
+will be routed to `https://api.myservice.com`. E.g.:
 
 ```
 http://localhost:4040/v2.4/account
 ```
 
-doesn't match any route defined in your configuration file, and
-will be proxied on to `http://api.myservice.com/v2.4/account`
+doesn't match any canned route so it will be proxied on to
+`http://api.myservice.com/v2.4/account`
 
 
 ###Headers

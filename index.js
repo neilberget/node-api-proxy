@@ -58,6 +58,10 @@ http.createServer(function(req, res) {
 	};
 
 	console.log("Proxying", options.url);
+
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+
 	req.pipe(request(options)).pipe(res);
 
 }).listen(PORT);
