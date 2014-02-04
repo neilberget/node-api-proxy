@@ -25,6 +25,15 @@ while the API endpoints are built out.
 
 It also allows you to be more thoughtful about your API spec.
 
+##To Start
+
+Run the process with the configuration file path as the only
+argument.
+
+```
+$ npm install mattpardee/node-api-proxy
+$ node node_modules/node-api-proxy/index.js ../../configs/proxy.json
+```
 
 ##How to Use
 
