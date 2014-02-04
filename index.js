@@ -12,7 +12,7 @@ process.on('uncaughtException', function (err) {
 });
 
 function cannedResponseHandler(req, res) {
-	if (!routeConfig.canned[req.url])
+        if (!routeConfig.canned || !routeConfig.canned[req.url])
 		return false;
 
 	var file = path.join(__dirname, routeConfig.canned[req.url]);
