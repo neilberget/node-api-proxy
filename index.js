@@ -2,31 +2,31 @@ var http = require('http')
 	, fs = require('fs')
 	, path = require('path')
 	, request = require('request')
-	, routeConfig = require('./config.json')
+	, routeConfig = require(process.argv.pop())
 	, PORT = 4040;
+
+var routeConfigLen = routeConfig.proxies.length;
 
 process.on('uncaughtException', function (err) {
   console.log('Caught exception: ' + err);
 });
 
 function cannedResponseHandler(req, res) {
-	// routeConfig[req.host] is not right. req.host will always be this server URL
-	if (routeConfig[req.host] && routeConfig[req.host].routes[req.url]) {
-		var file = routeConfig[req.host].routes[req.url];
-		console.log("Shipping canned response %s", req.url);
-		fs.stat(file, function(err, stat) {
-			res.writeHead(200, {
-				'Content-Type': 'application/json',
-				'Content-Length': stat.size
-			});
+	if (!routeConfig.canned[req.url])
+		return false;
 
-			fs.createReadStream(file).pipe(res);
+	var file = path.join(__dirname, routeConfig.canned[req.url]);
+	console.log("Shipping canned response %s", req.url);
+	fs.stat(file, function(err, stat) {
+		res.writeHead(200, {
+			'Content-Type': 'application/json',
+			'Content-Length': stat.size
 		});
 
-		return true;
-	}
+		fs.createReadStream(file).pipe(res);
+	});
 
-	return false;
+	return true;
 }
 
 var host;
@@ -39,18 +39,12 @@ http.createServer(function(req, res) {
 	if (splitReq.length <= 1)
 		return;
 
-	// Little bit of a snag. If we want to be able to route to
-	// multiple routes we need to be able to define that route
-	// in the request URL.
-
-	// Could it be... http://localhost:4040/https/api.server.com/v2.4/blah
-
-	if (req.url.substr(0, 3) === '/v3') {
-		host = 'http://10.77.72.99:3002';
-		req.url = req.url.substr(3);
-	}
-	else {
-		host = 'https://api.edmodoqa.com';
+	for (var i = 0; i < routeConfigLen; i++) {
+		if (req.url.indexOf(routeConfig.proxies[i].proxyURL) === 0) {
+			host = routeConfig.proxies[i].host + '/';
+			req.url = req.url.substr(routeConfig.proxies[i].proxyURL.length);
+			break;
+		}
 	}
 
 	var formattedUrl = host + req.url;
@@ -68,4 +62,4 @@ http.createServer(function(req, res) {
 
 }).listen(PORT);
 
-console.log("server pid %s listening on port %s", process.pid, port);
+console.log("server pid %s listening on port %s", process.pid, PORT);
