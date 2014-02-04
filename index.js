@@ -20,7 +20,9 @@ function cannedResponseHandler(req, res) {
 	fs.stat(file, function(err, stat) {
 		res.writeHead(200, {
 			'Content-Type': 'application/json',
-			'Content-Length': stat.size
+			'Content-Length': stat.size,
+			'Access-Control-Allow-Origin': '*',
+			'Access-Control-Allow-Headers': 'X-Requested-With'
 		});
 
 		fs.createReadStream(file).pipe(res);
@@ -32,6 +34,9 @@ function cannedResponseHandler(req, res) {
 var host;
 
 http.createServer(function(req, res) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+
 	if (cannedResponseHandler(req, res))
 		return;
 
@@ -59,10 +64,10 @@ http.createServer(function(req, res) {
 
 	console.log("Proxying", options.url);
 
-	res.setHeader("Access-Control-Allow-Origin", "*");
-	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
-
-	req.pipe(request(options)).pipe(res);
+	request(options, function(err, response, body) {
+		res.setHeader('content-type', response.headers['content-type']);
+		res.end(body);
+	});
 
 }).listen(PORT);
 
