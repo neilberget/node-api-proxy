@@ -34,8 +34,9 @@ function cannedResponseHandler(req, res) {
 var host;
 
 http.createServer(function(req, res) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
 	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+	res.setHeader("Access-Control-Allow-Credentials", "true");
 
 	if (cannedResponseHandler(req, res))
 		return;
