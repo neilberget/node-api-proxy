@@ -35,7 +35,7 @@ var host;
 
 http.createServer(function(req, res) {
 	res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
-	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, X-Proxy-Host");
 	res.setHeader("Access-Control-Allow-Credentials", "true");
 
 	if (cannedResponseHandler(req, res))
@@ -45,11 +45,15 @@ http.createServer(function(req, res) {
 	if (splitReq.length <= 1)
 		return;
 
-	for (var i = 0; i < routeConfigLen; i++) {
-		if (req.url.indexOf(routeConfig.proxies[i].proxyURL) === 0) {
-			host = routeConfig.proxies[i].host + '/';
-			req.url = req.url.substr(routeConfig.proxies[i].proxyURL.length);
-			break;
+	if (req.headers['x-proxy-host']) {
+		host = req.headers['x-proxy-host'];
+	} else {
+		for (var i = 0; i < routeConfigLen; i++) {
+			if (req.url.indexOf(routeConfig.proxies[i].proxyURL) === 0) {
+				host = routeConfig.proxies[i].host + '/';
+				req.url = req.url.substr(routeConfig.proxies[i].proxyURL.length);
+				break;
+			}
 		}
 	}
 
