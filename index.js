@@ -59,6 +59,7 @@ http.createServer(function(req, res) {
 			  Authorization: req.headers.authorization
 			, 'User-Agent': req.headers['user-agent']
 			, Connection: req.headers.connection
+                        , cookie: req.headers.cookie
 		}
 	};
 
