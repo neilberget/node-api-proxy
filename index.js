@@ -34,8 +34,9 @@ function cannedResponseHandler(req, res) {
 var host;
 
 http.createServer(function(req, res) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
 	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+	res.setHeader("Access-Control-Allow-Credentials", "true");
 
 	if (cannedResponseHandler(req, res))
 		return;
@@ -59,7 +60,7 @@ http.createServer(function(req, res) {
 			  Authorization: req.headers.authorization
 			, 'User-Agent': req.headers['user-agent']
 			, Connection: req.headers.connection
-                        , cookie: req.headers.cookie
+			, cookie: req.headers.cookie
 		}
 	};
 
