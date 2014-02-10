@@ -34,7 +34,7 @@ function cannedResponseHandler(req, res) {
 var host;
 
 var allowedHeaders = [
-  "Authorization",
+	"Authorization",
 	"Content-Type",
 	"X-Requested-With",
 	"X-Proxy-Host"
