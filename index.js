@@ -66,6 +66,7 @@ http.createServer(function(req, res) {
 			, 'User-Agent': req.headers['user-agent']
 			, Connection: req.headers.connection
 			, cookie: req.headers.cookie
+			, 'Content-Type': req.headers['content-type']
 		},
 		body: ""
 	};
@@ -73,7 +74,7 @@ http.createServer(function(req, res) {
 	console.log("Proxying %s %s", req.method, options.url);
 
 	req.on('data', function (data) {
-			options.body += data;
+		options.body += data;
 	});
 	req.on('end', function () {
 		request(options, function(err, response, body) {
