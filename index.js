@@ -60,6 +60,7 @@ http.createServer(function(req, res) {
 	var formattedUrl = host + req.url;
 	var options = {
 		url: formattedUrl,
+		method: req.method,
 		headers: {
 			  Authorization: req.headers.authorization
 			, 'User-Agent': req.headers['user-agent']
