@@ -35,7 +35,7 @@ var host;
 
 http.createServer(function(req, res) {
 	res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
-	res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, X-Proxy-Host");
+	res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Requested-With, X-Proxy-Host");
 	res.setHeader("Access-Control-Allow-Credentials", "true");
 
 	if (cannedResponseHandler(req, res))
@@ -70,10 +70,17 @@ http.createServer(function(req, res) {
 
 	console.log("Proxying", options.url);
 
-	request(options, function(err, response, body) {
-		res.setHeader('content-type', response.headers['content-type']);
-		res.end(body);
+	var body = "";
+	req.on('data', function (data) {
+			body += data;
 	});
+	req.on('end', function () {
+		request(options, function(err, response, body) {
+			res.setHeader('content-type', response.headers['content-type']);
+			res.end(body);
+		});
+	});
+
 
 }).listen(PORT);
 
