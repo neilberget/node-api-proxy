@@ -66,14 +66,14 @@ http.createServer(function(req, res) {
 			, 'User-Agent': req.headers['user-agent']
 			, Connection: req.headers.connection
 			, cookie: req.headers.cookie
-		}
+		},
+		body: ""
 	};
 
 	console.log("Proxying %s %s", req.method, options.url);
 
-	var body = "";
 	req.on('data', function (data) {
-			body += data;
+			options.body += data;
 	});
 	req.on('end', function () {
 		request(options, function(err, response, body) {
