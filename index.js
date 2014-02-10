@@ -16,7 +16,7 @@ function cannedResponseHandler(req, res) {
 		return false;
 
 	var file = path.join(__dirname, routeConfig.canned[req.url]);
-	console.log("Shipping canned response %s", req.url);
+	console.log("Shipping canned response %s %s", req.method, req.url);
 	fs.stat(file, function(err, stat) {
 		res.writeHead(200, {
 			'Content-Type': 'application/json',
@@ -60,6 +60,7 @@ http.createServer(function(req, res) {
 	var formattedUrl = host + req.url;
 	var options = {
 		url: formattedUrl,
+		method: req.method,
 		headers: {
 			  Authorization: req.headers.authorization
 			, 'User-Agent': req.headers['user-agent']
@@ -68,7 +69,7 @@ http.createServer(function(req, res) {
 		}
 	};
 
-	console.log("Proxying", options.url);
+	console.log("Proxying %s %s", req.method, options.url);
 
 	var body = "";
 	req.on('data', function (data) {
