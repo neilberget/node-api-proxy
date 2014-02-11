@@ -35,6 +35,13 @@ $ npm install mattpardee/node-api-proxy
 $ node node_modules/node-api-proxy/index.js ../../configs/proxy.json
 ```
 
+### Alternative using Docker
+
+If you have VirtualBox and Vagrant 1.4 or higher installed, you can also
+launch the proxy without having to install node or the node modules
+
+    ./dockerup.sh ./config.json
+
 ##How to Use
 
 Using Node API Proxy is a relatively simple process of updating
