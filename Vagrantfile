@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
     images: ["ubuntu"]
 
   config.vm.provision "shell",
-    inline: "cd /vagrant && docker build -t node-api-proxy . && echo '#{instructions}'"
+    inline: "cd /vagrant && docker build -t node-api-proxy ."
 end
 
 
