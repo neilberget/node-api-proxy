@@ -1,17 +1,16 @@
 {
 	"canned": {
-		"/v2.4/funding" : "../../tools/api-proxy/canned/funding.json",
-		"/v2.4/schools" : "../../tools/api-proxy/canned/schools.json",
-		"/v2.4/members" : "../../tools/api-proxy/canned/members.json"
+		"/v2.4/users" : "./canned/users.json",
+		"/v2.4/users/:userid" : "./canned/user.json"
 	},
 
 	"proxies": [
 		{
-			"host": "https://api.edmodoqa.com/v2.4",
-			"proxyURL": "/v2.4/"
+			"host": "https://api.yoursite.com/v2.4",
+			"proxyURL": "/v2.4"
 		},
 		{
-			"host": "http://10.77.72.99:3002",
+			"host": "http://api.yoursite.com/v3",
 			"proxyURL": "/v3/"
 		}
 	]

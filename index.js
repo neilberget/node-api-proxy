@@ -5,17 +5,62 @@ var http = require('http')
 	, routeConfig = require(process.argv.pop())
 	, PORT = 4040;
 
-var routeConfigLen = routeConfig.proxies.length;
+var routeConfigLen = routeConfig.proxies.length,
+	urlRegexes = [];
 
 process.on('uncaughtException', function (err) {
   console.log('Caught exception: ' + err);
 });
 
+/**
+ * Backbone's method for creating a RegEx out of a URL
+ * pattern. We'll use this to detect regular routes and
+ * generic routes like /users/:userid
+ */
+var optionalParam = /\((.*?)\)/g;
+var namedParam    = /(\(\?)?:\w+/g;
+var splatParam    = /\*\w+/g;
+var escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g;
+
+var _routeToRegExp = function(route) {
+	route = route.replace(escapeRegExp, '\\$&')
+		.replace(optionalParam, '(?:$1)?')
+		.replace(namedParam, function(match, optional) {
+		 return optional ? match : '([^/?]+)';
+		})
+		.replace(splatParam, '([^?]*?)');
+	return new RegExp('^' + route + '(?:\\?(.*))?$');
+}
+
+/**
+ * Go through the canned URLs and create regexes out of them
+ */
+if (routeConfig.canned) {
+	for (var c in routeConfig.canned) {
+		urlRegexes.push({
+			regex: _routeToRegExp(c),
+			path: routeConfig.canned[c]
+		});
+	}
+}
+
+var urlRegexesLen = urlRegexes.length,
+	foundCannedResponse = false;
+
 function cannedResponseHandler(req, res) {
-    if (!routeConfig.canned || !routeConfig.canned[req.url])
+	foundCannedResponse = false;
+
+	for (var i = 0; i < urlRegexesLen; i++) {
+		if (urlRegexes[i].regex.test(req.url)) {
+			foundCannedResponse = true;
+			break;
+		}
+	}
+
+	if (foundCannedResponse === false)
 		return false;
 
-	var file = path.join(__dirname, routeConfig.canned[req.url]);
+	var file = path.join(__dirname, urlRegexes[i].path);
 	console.log("Shipping canned response %s %s", req.method, req.url);
 	fs.stat(file, function(err, stat) {
 		res.writeHead(200, {
