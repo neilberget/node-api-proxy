@@ -32,19 +32,19 @@ function cannedResponseHandler(req, res) {
 }
 
 function chaosHandler(req, res) {
-  if (!routeConfig.chaos) return false;
+	if (!routeConfig.chaos) return false;
   
-  routeConfig.chaos.forEach(function(chaosRule) {
-    if (req.url.match(chaosRule.path)) {
-      var randNum = Math.random();
-      if (randNum < parseFloat(chaosRule.failure_rate)) {
-        console.log("Chaos!");
-        res.writeHead(500, {});
-        res.end("Chaos mode...");
-        return true;
-      }
-    }
-  });
+	routeConfig.chaos.forEach(function(chaosRule) {
+		if (req.url.match(chaosRule.path)) {
+			var randNum = Math.random();
+			if (randNum < parseFloat(chaosRule.failure_rate)) {
+				console.log("Chaos!");
+				res.writeHead(500, {});
+				res.end("Chaos mode...");
+				return true;
+			}
+		}
+	});
 }
 
 var host;
@@ -64,8 +64,8 @@ http.createServer(function(req, res) {
 	if (cannedResponseHandler(req, res))
 		return;
 
-  if (chaosHandler(req, res))
-    return;
+	if (chaosHandler(req, res))
+		return;
 
 	var splitReq = req.url.split('/');
 	if (splitReq.length <= 1)
@@ -87,7 +87,7 @@ http.createServer(function(req, res) {
 
 	console.log("Proxying %s %s", req.method, formattedUrl);
 
-  req.pipe(request(formattedUrl)).pipe(res);
+	req.pipe(request(formattedUrl)).pipe(res);
 
 }).listen(PORT);
 
