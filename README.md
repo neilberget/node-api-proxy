@@ -6,6 +6,7 @@ things:
 
 1. Catches requests on configued routes and sends back canned responses
 2. Proxies everything else on to an external server
+3. Lets you simulate transient failures with chaos mode
 
 If it proxies a request to the external server it will
 simply return the results back to the requesting application.
@@ -121,31 +122,31 @@ doesn't match any canned route so it will be proxied on to
 `http://api.myservice.com/v2.4/account`
 
 
-###Headers
+##### Chaos Mode
 
-When the requests are being proxied to the external service,
-there are some decisions made about the headers. Unfortunately
-I wasn't able to get `request`'s proxying functionality to
-simply pipe the results back to the calling client (for some
-reason it changes, for instance, the 'Authorization' header
-to 'authorization' which may not work for all services).
+You can tell the proxy to 500 error a percentage of the time on certain
+(or all) requests with chaos mode:
 
-In a huge win for lazyness I didn't investigate very far or issue
-a pull request to Request. Instead I just made a few decisions
-about which headers will get into the proxied request. This 
-is the code:
+_Examples_
 
-```javascript
-var options = {
-	url: formattedUrl,
-	headers: {
-		  Authorization: req.headers.authorization
-		, 'User-Agent': req.headers['user-agent']
-		, Connection: req.headers.connection
-	}
-};
-```
+This config will cause 10% of all requests through the proxy to fail:
 
-In the future I hope I can simply pass requests along on
-using request's pipe method or have more robust header
-support. Pull requests welcome!
+    "chaos": [
+      {
+        "path": ".*",
+        "failure_rate": ".1"
+      }
+    ]
+
+Or let's say we want 50% of a particular url should fail:
+
+    "chaos": [
+      {
+        "path": "\/some-url.*",
+        "failure_rate": ".2"
+      }
+    ]
+
+Keep in mind the path option is a regular expression, therefore you do need to
+escape special characters like '/'.
+

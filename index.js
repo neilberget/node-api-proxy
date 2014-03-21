@@ -31,6 +31,22 @@ function cannedResponseHandler(req, res) {
 	return true;
 }
 
+function chaosHandler(req, res) {
+  if (!routeConfig.chaos) return false;
+  
+  routeConfig.chaos.forEach(function(chaosRule) {
+    if (req.url.match(chaosRule.path)) {
+      var randNum = Math.random();
+      if (randNum < parseFloat(chaosRule.failure_rate)) {
+        console.log("Chaos!");
+        res.writeHead(500, {});
+        res.end("Chaos mode...");
+        return true;
+      }
+    }
+  });
+}
+
 var host;
 
 var allowedHeaders = [
@@ -47,6 +63,9 @@ http.createServer(function(req, res) {
 
 	if (cannedResponseHandler(req, res))
 		return;
+
+  if (chaosHandler(req, res))
+    return;
 
 	var splitReq = req.url.split('/');
 	if (splitReq.length <= 1)
@@ -65,31 +84,10 @@ http.createServer(function(req, res) {
 	}
 
 	var formattedUrl = host + req.url;
-	var options = {
-		url: formattedUrl,
-		method: req.method,
-		headers: {
-			  Authorization: req.headers.authorization
-			, 'User-Agent': req.headers['user-agent']
-			, Connection: req.headers.connection
-			, cookie: req.headers.cookie
-			, 'Content-Type': req.headers['content-type']
-		},
-		body: ""
-	};
 
-	console.log("Proxying %s %s", req.method, options.url);
+	console.log("Proxying %s %s", req.method, formattedUrl);
 
-	req.on('data', function (data) {
-		options.body += data;
-	});
-	req.on('end', function () {
-		request(options, function(err, response, body) {
-			res.setHeader('content-type', response.headers['content-type']);
-			res.end(body);
-		});
-	});
-
+  req.pipe(request(formattedUrl)).pipe(res);
 
 }).listen(PORT);
 
